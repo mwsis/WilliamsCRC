@@ -52,11 +52,8 @@ while [[ $# -gt 0 ]]; do
       ;;
     --help)
 
+      [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-WilliamsCRC is a port/wrapper of Ross Williams CRC library
-Copyright (c) 2019-2024, Matthew Wilson and Synesis Information Systems
-Copyright (c) 2010-2019, Matthew Wilson and Synesis Software
-Copyright (c) 1993, Ross Williams
 Creates/reinitialises the CMake build script(s)
 
 $ScriptPath [ ... flags/options ... ]
