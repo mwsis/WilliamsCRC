@@ -7,9 +7,7 @@ include **WilliamsCRC/WilliamsCRC.h** (or one of the utility headers), and compi
 or link-in the implementation. There are several ways to do this:
 
 - [CMake](#cmake)
-- [Custom makefile (as peer project)](#custom-makefile-as-peer-project)
 - [Bundled](#bundled)
-- [Custom makefile parameters](#custom-makefile-parameters)
 
 
 ## CMake
@@ -146,17 +144,7 @@ The primary choice for installation is by use of **CMake**.
       ```
 
 
-## Custom makefile (as peer project)
-
-T.B.C.
-
-
 ## Bundled
-
-T.B.C.
-
-
-## Custom makefile parameters
 
 T.B.C.
 
