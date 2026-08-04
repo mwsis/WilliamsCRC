@@ -18,6 +18,7 @@
 #include <xtests/terse-api.h>
 
 #include <stlsoft/stlsoft.h>
+#include <stlsoft/internal/safestr.h>
 
 #include <errno.h>
 #include <stdio.h>
@@ -43,17 +44,38 @@ static void test_file_pcb_read_null_ok(void);
  */
 
 static int
+fopen_(
+    FILE**          pf
+,   char const*     path
+,   char const*     mode
+)
+{
+#if defined(STLSOFT_USING_SAFE_STR_FUNCTIONS) && \
+    defined(STLSOFT_COMPILER_IS_MSVC)
+
+    return fopen_s(pf, path, mode);
+
+#else /* ? safe */
+
+    *pf = fopen(path, mode);
+
+    return (NULL != *pf) ? 0 : (0 != errno) ? errno : EMFILE;
+#endif /* safe */
+}
+
+static int
 write_temp_file_(
     char const*     path
 ,   void const*     pv
 ,   size_t          cb
 )
 {
-    FILE* f = fopen(path, "wb");
+    FILE* f = NULL;
+    int const e_open = fopen_(&f, path, "wb");
 
-    if (NULL == f)
+    if (0 != e_open)
     {
-        return (0 != errno) ? errno : EMFILE;
+        return e_open;
     }
 
     if (cb != fwrite(pv, 1, cb, f))
@@ -178,14 +200,14 @@ static void test_file_handle_matches_path(void)
     char const* const s = "123456789";
     crc_result_t path_result = 0;
     crc_result_t handle_result = 0;
-    FILE* f;
+    FILE* f = NULL;
 
     TEST_INT_EQ(0, WilliamsCRC_Init());
     TEST_INT_EQ(0, write_temp_file_(path, s, 9));
 
     TEST_INT_EQ(0, WilliamsCRC_CalculateFileCrc(path, 16, 0, &path_result));
 
-    f = fopen(path, "rb");
+    TEST_INT_EQ(0, fopen_(&f, path, "rb"));
     TEST_PTR_NE(NULL, f);
 
     TEST_INT_EQ(0, WilliamsCRC_CalculateFileHandleCrc(f, 16, 0, &handle_result));
@@ -205,12 +227,12 @@ static void test_file_handle_max_partial(void)
     crc_result_t block_result = 0;
     size_t num_read = 0;
     size_t const limit = 7;
-    FILE* f;
+    FILE* f = NULL;
 
     TEST_INT_EQ(0, WilliamsCRC_Init());
     TEST_INT_EQ(0, write_temp_file_(path, s, strlen(s)));
 
-    f = fopen(path, "rb");
+    TEST_INT_EQ(0, fopen_(&f, path, "rb"));
     TEST_PTR_NE(NULL, f);
 
     TEST_INT_EQ(0, WilliamsCRC_CalculateFileHandleCrcMax(f, limit, 32, 0, &handle_result, &num_read));
