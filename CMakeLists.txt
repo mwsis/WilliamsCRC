@@ -5,7 +5,7 @@
 # Purpose:  Top-level CMake lists file for WilliamsCRC
 #
 # Created:  31st December 2023
-# Updated:  17th February 2025
+# Updated:  4th August 2026
 #
 # ######################################################################## #
 
@@ -46,8 +46,8 @@ string(REGEX MATCH "#${RX_WS}*define${RX_WS}+_?${RX_PROJ_TAG}_VER_MAJOR${RX_WS}+
 set(_VERSION_MAJOR ${CMAKE_MATCH_1})
 string(REGEX MATCH "#${RX_WS}*define${RX_WS}+_?${RX_PROJ_TAG}_VER_MINOR${RX_WS}+([0-9]+)" MINOR_DUMMY ${_header_file})
 set(_VERSION_MINOR ${CMAKE_MATCH_1})
-string(REGEX MATCH "#${RX_WS}*define${RX_WS}+_?${RX_PROJ_TAG}_VER_REVISION${RX_WS}+([0-9]+)" PATCH_DUMMY ${_header_file})
-set(_VERSION_PATCH ${CMAKE_MATCH_1})
+string(REGEX MATCH "#${RX_WS}*define${RX_WS}+_?${RX_PROJ_TAG}_VER_(PATCH|REVISION)${RX_WS}+([0-9]+)" PATCH_DUMMY ${_header_file})
+set(_VERSION_PATCH ${CMAKE_MATCH_2})
 
 # set project version number here
 set(PROJECT_VERSION_MAJOR ${_VERSION_MAJOR})
@@ -98,10 +98,11 @@ option(BUILD_TESTING "Build tests" ON)
 # dependencies
 #
 # required:
+# - STLSoft - required for the core library implementation;
+# - xTests - required for testing (when BUILD_TESTING is ON);
 #
 # optional:
-# - STLSoft - required unless NO_B64_CPP_API is specified, and by xTests
-#    (for testing);
+# - shwild - for enhanced match constructs in xTests (unless NO_SHWILD);
 
 
 # ############################
@@ -136,6 +137,38 @@ else()
 
 	include_directories(${STLSOFT_INCLUDE_DIR})
 endif()
+
+
+# ############################
+# shwild (optional)
+
+if(NOT (NO_SHWILD))
+
+	if(BUILD_TESTING)
+
+		find_package(shwild QUIET)
+
+		if(shwild_FOUND)
+
+			message("-- CMake package shwild found (version ${shwild_VERSION})")
+
+			add_compile_definitions(XTESTS_HAS_SHWILD)
+		endif(shwild_FOUND)
+	endif(BUILD_TESTING)
+endif()
+
+
+# ############################
+# xTests
+
+if(BUILD_TESTING)
+
+	set(xTests_REQUIRED_VERSION_ 0.26)
+
+	find_package(xTests ${xTests_REQUIRED_VERSION_} REQUIRED)
+
+	message("-- CMake package xTests found (version ${xTests_VERSION}; ${xTests_REQUIRED_VERSION_} requested)")
+endif(BUILD_TESTING)
 
 
 # ################################################
