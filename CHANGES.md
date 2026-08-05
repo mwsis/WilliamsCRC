@@ -11,7 +11,7 @@
 * Fixed **WilliamsCRC_CalculateFileHandleCrc()** NULL dereference when no byte-count out-parameter is supplied;
 * Fixed stale **b64** copy-paste in **CMakeLists.txt** / **test/CMakeLists.txt** (implicit-link suppress define; dependency comments);
 * Fixed MSVC C4996 (`fopen`) in **test.unit.file_crc** via safe-open helper;
-* **test.scratch.file_checksum** now smokes with no arguments (checksums self);
+* Added **examples/cpp/file_checksum** (promoted from **test.scratch.file_checksum**; smokes with no arguments by checksumming itself);
 * CMake helper-script enhancements (**ProjectName** from **.sis/project_name.txt**; MinGW `MakeCmd` consistency; modernised **run_all_unit_tests.sh** / **run_all_unit_tests.cmd** with `--unit-only` / `--component-only`);
 * Project boilerplate canonicalisation (**INSTALL.md** **STLSoft** clone URL; **FAQ.md** / **TODO.md** tidy);
 
