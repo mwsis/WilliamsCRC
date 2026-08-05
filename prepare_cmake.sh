@@ -4,13 +4,22 @@ ScriptPath=$0
 Dir=$(cd $(dirname "$ScriptPath"); pwd)
 Basename=$(basename "$ScriptPath")
 CMakeDir=${SIS_CMAKE_BUILD_DIR:-$Dir/_build}
-[[ -n "$MSYSTEM" ]] && DefaultMakeCmd=mingw32-make.exe || DefaultMakeCmd=make
+if [[ -n "$MSYSTEM" ]]; then
+
+  DefaultMakeCmd=mingw32-make.exe
+  MinGW=1
+else
+
+  DefaultMakeCmd=make
+fi
 MakeCmd=${SIS_CMAKE_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-$DefaultMakeCmd}}
+ProjectNameFile="$Dir/.sis/project_name.txt"
+ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
 
 Configuration=Release
 ExamplesDisabled=0
-MinGW=0
+MinGW="${MinGW:=0}"
 RunMake=0
 STLSoftDirGiven=
 TestingDisabled=0
@@ -81,11 +90,13 @@ Flags/options:
     -T
     --disable-testing
         disables building of tests (by setting BUILD_TESTING=OFF). Unless
-        testing is disabled the STLSoft and xTests libraries will be
-        required to be available to CMake
+        testing is disabled the xTests library will be required to be
+        available to CMake (in addition to STLSoft, which is always
+        required for ${ProjectName})
 
     --mingw
-        uses explicitly the "MinGW Makefiles" generator
+        uses explicitly the "MinGW Makefiles" generator, and defaults the
+        make-command to "mingw32-make.exe"
 
     -m
     --run-make
@@ -95,7 +106,8 @@ Flags/options:
     --stlsoft-root-dir <dir>
         specifies the STLSoft root-directory, which will be passed to CMake
         as the variable STLSOFT, and which will override the environment
-        variable STLSOFT (if present)
+        variable STLSOFT (if present). NOTE: STLSoft is always required for
+        ${ProjectName}
 
 
     standard flags:
@@ -126,7 +138,7 @@ mkdir -p $CMakeDir || exit 1
 
 cd $CMakeDir
 
-echo "Executing CMake (in ${CMakeDir})"
+echo "Executing CMake for ${ProjectName} (in ${CMakeDir})"
 
 if [ $ExamplesDisabled -eq 0 ]; then CMakeBuildExamplesFlag="ON" ; else CMakeBuildExamplesFlag="OFF" ; fi
 if [ -z $STLSoftDirGiven ]; then CMakeSTLSoftVariable="" ; else CMakeSTLSoftVariable="-DSTLSOFT=$STLSoftDirGiven/" ; fi
@@ -158,6 +170,7 @@ else
     || (cd ->/dev/null ; exit 1)
 fi
 
+
 status=0
 
 if [ $RunMake -ne 0 ]; then
@@ -180,4 +193,3 @@ exit $status
 
 
 # ############################## end of file ############################# #
-
