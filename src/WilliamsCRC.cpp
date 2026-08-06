@@ -4,7 +4,7 @@
  * Purpose:     Implementation of WilliamsCRC API.
  *
  * Created:     1st March 2010
- * Updated:     1st January 2024
+ * Updated:     5th August 2026
  *
  * Author:      Matthew Wilson
  *
@@ -585,13 +585,15 @@ WilliamsCRC_CalculateFileHandleCrc(
 ,   crc_result_t*   result
 )
 {
+    size_t  dummy;
+
     return WilliamsCRC_CalculateFileHandleCrc_(
             f
         ,   0
         ,   crc_bits
         ,   polynomial
         ,   result
-        ,   NULL
+        ,   &dummy
         );
 }
 

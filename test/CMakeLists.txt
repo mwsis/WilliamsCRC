@@ -22,7 +22,7 @@ if(WIN32)
 	endif()
 
 	# suppress implicit-link file
-	add_definitions(-DB64_INCL_B64_H_IMPLICIT_LINK)
+	add_definitions(-DWILLIAMSCRC_INCL_WILLIAMSCRC_H_IMPLICIT_LINK)
 endif(WIN32)
 
 if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
@@ -31,6 +31,7 @@ if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
 endif()
 
 add_subdirectory(scratch)
+add_subdirectory(unit)
 
 
 # ############################## end of file ############################# #

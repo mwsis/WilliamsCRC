@@ -7,9 +7,7 @@ include **WilliamsCRC/WilliamsCRC.h** (or one of the utility headers), and compi
 or link-in the implementation. There are several ways to do this:
 
 - [CMake](#cmake)
-- [Custom makefile (as peer project)](#custom-makefile-as-peer-project)
 - [Bundled](#bundled)
-- [Custom makefile parameters](#custom-makefile-parameters)
 
 
 ## CMake
@@ -26,12 +24,12 @@ The primary choice for installation is by use of **CMake**.
    ```
 
 2. Obtain the latest distribution of **STLSoft**, from
-   https://github.com/synesissoftware/STLSoft-1.11/, e.g.
+   https://github.com/synesissoftware/STLSoft/, e.g.
 
    ```bash
    $ mkdir -p ~/open-source
    $ cd ~/open-source
-   $ git clone https://github.com/synesissoftware/STLSoft-1.11/
+   $ git clone https://github.com/synesissoftware/STLSoft/
    ```
 
 3. Prepare the CMake configuration, via the **prepare_cmake.sh** script,
@@ -39,9 +37,9 @@ The primary choice for installation is by use of **CMake**.
    `--stlsoft-root-dir` option, as in:
 
    ```bash
-   # Assuming step-2 cloned into ~/open-source/STLSoft-1.11
+   # Assuming step-2 cloned into ~/open-source/STLSoft
    $ cd ~/open-source/WilliamsCRC
-   $ ./prepare_cmake.sh --stlsoft-root-dir ~/open-source/STLSoft-1.11 -v
+   $ ./prepare_cmake.sh --stlsoft-root-dir ~/open-source/STLSoft -v
    ```
 
    (**Hint**: execute `$ ./prepare_cmake.sh --help` for more information.)
@@ -58,7 +56,7 @@ The primary choice for installation is by use of **CMake**.
    or:
 
    ```bash
-   $ STLSOFT=~/open-source/STLSoft-1.11 ./prepare_cmake.sh -v
+   $ STLSOFT=~/open-source/STLSoft ./prepare_cmake.sh -v
    ```
 
    If you have already obtained **STLSoft** and
@@ -79,17 +77,16 @@ The primary choice for installation is by use of **CMake**.
    (**NOTE**: if you provide the flag `--run-make` in step 3 then you do
    not need this step.)
 
-5. As a check, execute the built test program files via the
-   **build_run_all_unit_tests.sh** script, as in:
+5. As a check, execute the built unit-test programs via the
+   **run_all_unit_tests.sh** script, as in:
 
    ```bash
    $ ./run_all_unit_tests.sh
    ```
 
-   (**NOTE**: because **WilliamsCRC** is a unit-testing library its own tests
-   are just scratch tests, and all fail _by-design_ so expect to see a
-   lot of output, which is indicative of what you will see when you
-   detect failure in your own tests using **WilliamsCRC**.)
+   (**NOTE**: building tests requires [**xTests**](https://github.com/synesissoftware/xTests)
+   to be available to **CMake**, in addition to **STLSoft**. Pass
+   `--disable-testing` to **prepare_cmake.sh** if you do not need them.)
 
 6. Install the library on the host, via `cmake`, as in:
 
@@ -146,17 +143,7 @@ The primary choice for installation is by use of **CMake**.
       ```
 
 
-## Custom makefile (as peer project)
-
-T.B.C.
-
-
 ## Bundled
-
-T.B.C.
-
-
-## Custom makefile parameters
 
 T.B.C.
 

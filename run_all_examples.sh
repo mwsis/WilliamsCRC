@@ -11,7 +11,6 @@ ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
 ListOnly=0
 RunMake=1
-Verbosity=${XTESTS_VERBOSITY:-${TEST_VERBOSITY:-3}}
 
 
 # ##########################################################
@@ -28,16 +27,11 @@ while [[ $# -gt 0 ]]; do
 
       RunMake=0
       ;;
-    --verbosity)
-
-      shift
-      Verbosity=$1
-      ;;
     --help)
 
       [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-Runs all (matching) performance-test and scratch-test programs
+Runs all example programs
 
 $ScriptPath [ ... flags/options ... ]
 
@@ -52,9 +46,6 @@ Flags/options:
     -M
     --no-make
         does not execute CMake and make before running tests
-
-    --verbosity <verbosity>
-        specifies an explicit verbosity for the unit-test(s)
 
 
     standard flags:
@@ -87,7 +78,7 @@ if [ $RunMake -ne 0 ]; then
 
   if [ $ListOnly -eq 0 ]; then
 
-    echo "Executing build of ${ProjectName} (via command \`$MakeCmd\`) and then running all scratch (and performance) test programs"
+    echo "Executing build of ${ProjectName} (via command \`$MakeCmd\`) and then running all example programs"
 
     mkdir -p $CMakeDir || exit 1
 
@@ -110,39 +101,30 @@ if [ $status -eq 0 ]; then
 
   if [ $ListOnly -ne 0 ]; then
 
-    echo "Listing all ${ProjectName} scratch (and performance) test programs"
+    echo "Listing all ${ProjectName} example programs"
   else
 
-    echo "Running all ${ProjectName} scratch (and performance) test programs"
+    echo "Running all ${ProjectName} example programs"
   fi
 
-  for f in $(find $CMakeDir -type f '(' -name 'test_scratch*' -o -name 'test.scratch.*' -o -name 'test_performance*' -o -name 'test.performance.*' ')' -exec test -x {} \; -print)
-  do
+  if [ -d "$CMakeDir/examples" ]; then
 
-    if [ $ListOnly -ne 0 ]; then
+    for f in $(find "$CMakeDir/examples" -type f -exec test -x {} \; -print | sort)
+    do
 
-      echo "would execute $f:"
+      if [ $ListOnly -ne 0 ]; then
 
-      continue
-    fi
+        echo "would execute $f:"
 
-    if [ $Verbosity -ge 3 ]; then
+        continue
+      fi
 
       echo
-    fi
-    if [ $Verbosity -ge 2 ]; then
-
       echo "executing $f:"
-    fi
 
-    if $f; then
-
-      :
-    else
-
-      status=$?
-    fi
-  done
+      $f
+    done
+  fi
 fi
 
 exit $status

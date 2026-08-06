@@ -1,3 +1,14 @@
+/* /////////////////////////////////////////////////////////////////////////
+ * File:    test.scratch.file_checksum.cpp
+ *
+ * Purpose: Scratch program: CRC of a file (path + optional byte limit).
+ *          With no arguments, smokes against the executable path itself.
+ *
+ * Created: ...
+ * Updated: 5th August 2026
+ *
+ * ////////////////////////////////////////////////////////////////////// */
+
 
 /* /////////////////////////////////////////////////////////////////////////
  * includes
@@ -14,6 +25,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -35,11 +47,17 @@ int main(int argc, char* argv[])
     const int           BIT_SIZE    =   30;
     const crc_poly_t    POLYNOMIAL  =   0xEDB88320; /* CRC-32 (Reversed) */
 
-    size_t  byteReadLimit = 0;
-    char*   endptr;
+    size_t              byteReadLimit = 0;
+    char*               endptr;
+    char const*         inputPath = NULL;
 
     switch (argc)
     {
+    case 1:
+
+        /* Smoke / CI: checksum the executable itself */
+        inputPath = argv[0];
+        break;
     case 2:
 
         if (0 == ::strcmp("--help", argv[1]))
@@ -47,15 +65,18 @@ int main(int argc, char* argv[])
             std::cout
                 << "USAGE: "
                 << platformstl::get_executable_name_from_path(argv[0])
-                << " { <input-path> [ <byte-read-limit> ] | --help }"
+                << " [ <input-path> [ <byte-read-limit> ] | --help ]"
                 << std::endl
                 ;
 
             return EXIT_SUCCESS;
         }
+
+        inputPath = argv[1];
         break;
     case 3:
 
+        inputPath = argv[1];
         byteReadLimit = ::strtoul(argv[2], &endptr, 0);
 
         assert(nullptr != endptr);
@@ -76,11 +97,9 @@ int main(int argc, char* argv[])
         break;
     default:
 
-        assert(0 != argc);
-
         std::cerr
             << platformstl::get_executable_name_from_path(argv[0])
-            << ": input-path not specified"
+            << ": too many arguments"
             << "; use --help for usage"
             << std::endl
             ;
@@ -88,7 +107,8 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    char const* const   inputPath   =   argv[1];
+    assert(nullptr != inputPath);
+
     crc_result_t        result;
     size_t              numRead;
     int const           rc          =   WilliamsCRC_CalculateFileCrcMax(
@@ -119,6 +139,7 @@ int main(int argc, char* argv[])
 
     return EXIT_SUCCESS;
 }
+
 
 /* ///////////////////////////// end of file //////////////////////////// */
 

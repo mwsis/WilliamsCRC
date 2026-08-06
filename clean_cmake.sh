@@ -4,7 +4,10 @@ ScriptPath=$0
 Dir=$(cd $(dirname "$ScriptPath"); pwd)
 Basename=$(basename "$ScriptPath")
 CMakeDir=${SIS_CMAKE_BUILD_DIR:-$Dir/_build}
-MakeCmd=${SIS_CMAKE_COMMAND:-make}
+[[ -n "$MSYSTEM" ]] && DefaultMakeCmd=mingw32-make.exe || DefaultMakeCmd=make
+MakeCmd=${SIS_CMAKE_MAKE_COMMAND:-${SIS_CMAKE_COMMAND:-$DefaultMakeCmd}}
+ProjectNameFile="$Dir/.sis/project_name.txt"
+ProjectName=$(tr -d '[:space:]' < "$ProjectNameFile")
 
 
 # ##########################################################
@@ -15,11 +18,8 @@ while [[ $# -gt 0 ]]; do
   case $1 in
     --help)
 
+      [ -f "$Dir/.sis/script_info_lines.txt" ] && cat "$Dir/.sis/script_info_lines.txt"
       cat << EOF
-WilliamsCRC is a port/wrapper of Ross Williams CRC library
-Copyright (c) 2019-2024, Matthew Wilson and Synesis Information Systems
-Copyright (c) 2010-2019, Matthew Wilson and Synesis Software
-Copyright (c) 1993, Ross Williams
 Executes CMake-generated artefacts to clean project
 
 $ScriptPath [ ... flags/options ... ]
@@ -71,7 +71,7 @@ else
     exit 1
   else
 
-    echo "Cleaning build (via command \`$MakeCmd clean\`)"
+    echo "Cleaning build of ${ProjectName} (via command \`$MakeCmd clean\`)"
 
     $MakeCmd clean
     status=$?
